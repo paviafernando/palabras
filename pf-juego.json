@@ -11,7 +11,7 @@
     "📒 Figuritas",
     "👑 Modo princesa"
   ],
-  "url": "https://palabras-REEMPLAZAR.vercel.app",
+  "url": "https://palabras-theta.vercel.app",
   "players": {
     "min": 1,
     "max": 8
@@ -19,6 +19,5 @@
   "tv": "/?hub={code}",
   "pad": "/?c={code}&hub={code}",
   "solo": "/",
-  "offline": "/",
-  "hidden": true
+  "offline": "/"
 }
