@@ -1,0 +1,2 @@
+{ "name": "Palabra secreta", "short_name": "Palabras", "start_url": "/", "display": "fullscreen", "background_color": "#141b33", "theme_color": "#1d2540",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }] }

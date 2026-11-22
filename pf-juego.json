@@ -1,0 +1,24 @@
+{
+  "id": "palabras",
+  "name": "Palabra secreta",
+  "emoji": "🎈",
+  "color": "#4d7cfe",
+  "group": "Palabras",
+  "order": 15,
+  "desc": "Adiviná la palabra antes de que se vuelen los globos. ¡Por turnos y con figuritas!",
+  "tags": [
+    "🔤 480 palabras",
+    "📒 Figuritas",
+    "👑 Modo princesa"
+  ],
+  "url": "https://palabras-REEMPLAZAR.vercel.app",
+  "players": {
+    "min": 1,
+    "max": 8
+  },
+  "tv": "/?hub={code}",
+  "pad": "/?c={code}&hub={code}",
+  "solo": "/",
+  "offline": "/",
+  "hidden": true
+}
