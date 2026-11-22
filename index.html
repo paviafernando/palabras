@@ -57,6 +57,9 @@ body.princess .pill.on{color:#fff}
 .pcard .t b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pcard .t small{color:var(--soft);font-size:.8em}
 .pcard .ck{font-size:1.3em}
+.pwrap{display:flex;gap:.8vmin}
+.pwrap .pcard{flex:1;min-width:0}
+.pwrap .ed{flex:none;width:min(9vmin,64px);border-radius:20px;background:var(--panel);font-size:min(3.6vmin,24px)}
 .avs{display:grid;grid-template-columns:repeat(8,1fr);gap:1vmin;width:min(640px,94vw)}
 .avb{font-size:min(6vmin,40px);aspect-ratio:1;border-radius:18px;background:var(--panel);border:3px solid transparent}
 .avb.on{border-color:var(--accent);transform:scale(1.06)}
@@ -206,7 +209,7 @@ body.princess #pStatus.turn{color:#fff}
 <!-- ============ JUGADORES ============ -->
 <section class="screen hidden" id="players">
   <h2>¿Quiénes juegan?</h2>
-  <p class="sub">Tocá para sumar o sacar. Con el celu también se suman solos.</p>
+  <p class="sub">Tocá para sumar o sacar · ✏️ para cambiar nombre, reiniciar o borrar. Con el celu se suman solos.</p>
   <div class="plist" id="plist"></div>
   <div class="row">
     <button class="pill" data-nav data-act="newPlayer">➕ Nuevo jugador</button>
@@ -219,6 +222,7 @@ body.princess #pStatus.turn{color:#fff}
   <div class="avs" id="avs"></div>
   <input class="inp" id="newName" maxlength="12" placeholder="Nombre" autocomplete="off">
   <div class="row"><button class="pill" data-nav data-act="back">Cancelar</button><button class="big" data-nav data-act="savePlayer">¡Listo!</button></div>
+  <div class="row hidden" id="editExtra"><button class="pill" data-nav data-act="resetPlayer">🔄 Reiniciar puntajes</button><button class="pill" data-nav data-act="deletePlayer">🗑️ Borrar jugador</button></div>
 </section>
 
 <!-- ============ MODO ============ -->
@@ -542,14 +546,18 @@ function renderPlayers() {
   const ids = new Set(S.roster);
   const phones = [...pads.values()].filter(p => p.ready);
   $('#plist').innerHTML = Object.values(S.profiles).filter(p => !phones.some(x => x.id === p.id)).map(p =>
-    `<button class="pcard${ids.has(p.id) ? ' on' : ''}" data-nav data-toggle="${p.id}"><span class="av">${esc(p.av)}</span><span class="t"><b>${esc(p.name)}</b><small>${levelName(levelOf(p.xp))} · ${p.coins} 🪙</small></span><span class="ck">${ids.has(p.id) ? '✅' : '➕'}</span></button>`).join('') +
+    `<div class="pwrap"><button class="pcard${ids.has(p.id) ? ' on' : ''}" data-nav data-toggle="${p.id}"><span class="av">${esc(p.av)}</span><span class="t"><b>${esc(p.name)}</b><small>${levelName(levelOf(p.xp))} · ${p.coins} 🪙 · 📒 ${albumCount(p)}</small></span><span class="ck">${ids.has(p.id) ? '✅' : '➕'}</span></button><button class="ed" data-nav data-edit="${p.id}" title="Editar">✏️</button></div>`).join('') +
     phones.map(p => `<div class="pcard on"><span class="av">${esc(p.av)}</span><span class="t"><b>${esc(p.name)}</b><small>📱 con su celular</small></span><span class="ck">📱</span></div>`).join('');
 }
-let newAv = AVATARS[0];
-function openNewPlayer() {
-  newAv = pick(AVATARS);
+let newAv = AVATARS[0], editId = null;
+function openNewPlayer(id) {
+  editId = id || null;
+  const pr = editId && S.profiles[editId];
+  newAv = pr ? pr.av : pick(AVATARS);
+  $('#newpTitle').textContent = pr ? 'Editar jugador' : 'Nuevo jugador';
+  $('#editExtra').classList.toggle('hidden', !pr);
   $('#avs').innerHTML = AVATARS.map(a => `<button class="avb${a === newAv ? ' on' : ''}" data-nav data-av="${a}">${a}</button>`).join('');
-  $('#newName').value = '';
+  $('#newName').value = pr ? pr.name : '';
   show('newp');
 }
 
@@ -868,7 +876,25 @@ function act(a, el) {
     case 'newPlayer': openNewPlayer(); break;
     case 'savePlayer': {
       const name = ($('#newName').value.trim() || 'Jugador').slice(0, 12);
-      const p = newProfile(name, newAv); if (!S.roster.includes(p.id)) S.roster.push(p.id); save(); back(); renderPlayers(); break;
+      const p = newProfile(name, newAv, editId || undefined); if (!S.roster.includes(p.id)) S.roster.push(p.id); save(); back(); renderPlayers(); break;
+    }
+    case 'resetPlayer': {
+      const pr = S.profiles[editId]; if (!pr) break;
+      showOv(`<div class="res-e">🔄</div><h2>¿Reiniciar a ${esc(pr.av)} ${esc(pr.name)}?</h2><p class="sub">Vuelve a 0: monedas, nivel, estrellas y álbum de figuritas.</p><div class="row"><button class="pill" data-nav data-act="closeOv">No</button><button class="big" data-nav data-act="resetYes">Sí, reiniciar</button></div>`); break;
+    }
+    case 'resetYes': {
+      const pr = S.profiles[editId];
+      if (pr) { Object.keys(pr).forEach(k => { if (/^pg\d/.test(k)) delete pr[k]; }); Object.assign(pr, { coins: 0, xp: 0, words: 0, stars: 0, album: {}, packs: 0 }); save(); toast(`🔄 ${esc(pr.name)} empieza de cero`); }
+      hideOv(); back(); renderPlayers(); break;
+    }
+    case 'deletePlayer': {
+      const pr = S.profiles[editId]; if (!pr) break;
+      showOv(`<div class="res-e">🗑️</div><h2>¿Borrar a ${esc(pr.av)} ${esc(pr.name)}?</h2><p class="sub">Se pierden sus monedas y su álbum.</p><div class="row"><button class="pill" data-nav data-act="closeOv">No</button><button class="big" data-nav data-act="deleteYes">Sí, borrar</button></div>`); break;
+    }
+    case 'deleteYes': {
+      const pr = S.profiles[editId];
+      if (pr) { delete S.profiles[editId]; S.roster = S.roster.filter(x => x !== editId); save(); toast(`🗑️ Se borró a ${esc(pr.name)}`); }
+      hideOv(); back(); renderPlayers(); break;
     }
     case 'secret': S.secret = !S.secret; save(); renderMode(); break;
     case 'go': hideOv(); startMatch(); break;
@@ -895,6 +921,7 @@ document.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.act) return act(b.dataset.act, b);
   if (b.dataset.k) { if (cur === 'game') press(b.dataset.k); return; }
+  if (b.dataset.edit) { openNewPlayer(b.dataset.edit); return; }
   if (b.dataset.toggle) { const id = b.dataset.toggle; S.roster = S.roster.includes(id) ? S.roster.filter(x => x !== id) : [...S.roster, id]; save(); renderPlayers(); SFX.key(); return; }
   if (b.dataset.av) { newAv = b.dataset.av; $$('#avs .avb').forEach(x => x.classList.toggle('on', x === b)); SFX.key(); return; }
   if (b.dataset.diff) { S.diff = b.dataset.diff; save(); renderMode(); b.focus(); $(`[data-diff="${S.diff}"]`)?.focus(); SFX.key(); return; }
