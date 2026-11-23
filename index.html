@@ -48,6 +48,31 @@ body.princess .pill.on{color:#fff}
 #joinBox .qr svg{width:100%;height:100%;display:block}
 #joinBox b{font-size:min(6vmin,40px);color:var(--accent);letter-spacing:.12em}
 #joinBox p{margin:0;font-size:min(2.8vmin,18px);color:var(--soft);max-width:30ch}
+/* pantalla completa (siempre a mano) */
+#fsBtn{position:fixed;top:2vmin;right:2vmin;z-index:55}
+#fsBtn.on{background:var(--accent);color:#3a2300}
+.corner.r{right:calc(3vmin + min(8vmin,56px))}
+#gtop{padding-right:calc(min(8vmin,56px) + 2vmin)!important}
+body.pad #fsBtn{position:static}
+/* ¿quién juega? */
+.logo.small{font-size:min(13vmin,96px)}
+.whoBox{display:flex;flex-direction:column;align-items:center;gap:1.2vmin;background:var(--panel);border-radius:28px;padding:2vmin 2.4vmin;width:min(1000px,96vw)}
+.whoBox h2{font-size:min(5vmin,32px)}
+.who{display:flex;flex-wrap:wrap;gap:clamp(10px,2vmin,22px);justify-content:center}
+.wb{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;width:clamp(76px,16vmin,130px);font-weight:800;font-size:clamp(15px,2.6vmin,20px);border-radius:22px;padding:6px 2px;transition:transform .15s}
+.wb:active{transform:scale(.94)}
+.wb .av{width:clamp(64px,14vmin,110px);aspect-ratio:1;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:clamp(40px,8vmin,62px);filter:grayscale(1);opacity:.45;transition:all .25s}
+.wb.on .av{filter:none;opacity:1;box-shadow:0 0 0 5px var(--accent),0 8px 22px rgba(0,0,0,.3)}
+.wb .ck{position:absolute;top:2px;right:8%;min-width:30px;height:30px;border-radius:15px;background:var(--ok);color:#fff;display:grid;place-items:center;font-size:17px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.wb .ck:empty{display:none}
+.wb .nm{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb small{font-size:.75em;font-weight:700;color:var(--soft);white-space:nowrap}
+.wb.add .av{background:transparent;border:3px dashed var(--soft);filter:none;opacity:.9;font-size:clamp(30px,6vmin,46px)}
+.who.editing .wb .ck{background:var(--accent);color:#3a2300}
+.who.editing .wb .av{filter:none;opacity:1}
+.who.editing .wb:not(.add){animation:wiggle 1.2s ease-in-out infinite}
+@keyframes wiggle{25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
+#btnPlay.off{opacity:.55}
 /* jugadores */
 .plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(30vmin,220px),1fr));gap:1.4vmin;width:min(900px,96vw)}
 .pcard{display:flex;align-items:center;gap:1.2vmin;padding:1.2vmin 1.6vmin;border-radius:20px;background:var(--panel);border:3px solid transparent;text-align:left;font-size:min(3.2vmin,20px)}
@@ -60,7 +85,8 @@ body.princess .pill.on{color:#fff}
 .pwrap{display:flex;gap:.8vmin}
 .pwrap .pcard{flex:1;min-width:0}
 .pwrap .ed{flex:none;width:min(9vmin,64px);border-radius:20px;background:var(--panel);font-size:min(3.6vmin,24px)}
-.avs{display:grid;grid-template-columns:repeat(8,1fr);gap:1vmin;width:min(640px,94vw)}
+.avs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(17vw,72px),1fr));gap:8px;width:min(640px,94vw)}
+#avPrev{width:clamp(96px,18vmin,140px);aspect-ratio:1;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:clamp(56px,11vmin,84px);box-shadow:0 0 0 6px var(--accent),0 10px 26px rgba(0,0,0,.3);animation:bob 2.4s ease-in-out infinite}
 .avb{font-size:min(6vmin,40px);aspect-ratio:1;border-radius:18px;background:var(--panel);border:3px solid transparent}
 .avb.on{border-color:var(--accent);transform:scale(1.06)}
 .inp{font-size:min(4.4vmin,28px);padding:.5em .8em;border-radius:16px;background:var(--panel);border:3px solid transparent;text-align:center;width:min(480px,90vw)}
@@ -189,16 +215,16 @@ body.princess #pStatus.turn{color:#fff}
     <button class="ib" data-nav data-act="album" title="Álbum">📒<span class="badge hidden" id="packBadge">!</span></button>
     <button class="ib" data-nav data-act="opts" title="Opciones">⚙️</button>
   </div>
-  <div class="logo">🎈</div>
+  <div class="logo small">🎈</div>
   <h1>Palabra secreta</h1>
-  <p class="sub">Adiviná la palabra antes de que se vuelen todos los globos</p>
-  <div class="row" id="startPlayers"></div>
-  <div class="row">
-    <button class="big" data-nav data-act="play" id="btnPlay">▶ Jugar</button>
+  <div class="whoBox">
+    <h2 id="whoTitle">¿Quién juega?</h2>
+    <p class="sub" id="whoHint"></p>
+    <div class="who" id="who"></div>
+    <div class="row" id="whoTools"></div>
   </div>
   <div class="row">
-    <button class="pill" data-nav data-act="players">👥 Jugadores</button>
-    <button class="pill" data-nav data-act="album">📒 Álbum de figuritas</button>
+    <button class="big" data-nav data-act="play" id="btnPlay">▶ Jugar</button>
   </div>
   <div id="joinBox" class="hidden">
     <div class="qr" id="qr"></div>
@@ -206,19 +232,10 @@ body.princess #pStatus.turn{color:#fff}
   </div>
 </section>
 
-<!-- ============ JUGADORES ============ -->
-<section class="screen hidden" id="players">
-  <h2>¿Quiénes juegan?</h2>
-  <p class="sub">Tocá para sumar o sacar · ✏️ para cambiar nombre, reiniciar o borrar. Con el celu se suman solos.</p>
-  <div class="plist" id="plist"></div>
-  <div class="row">
-    <button class="pill" data-nav data-act="newPlayer">➕ Nuevo jugador</button>
-    <button class="big" data-nav data-act="back">Listo</button>
-  </div>
-</section>
-
 <section class="screen hidden" id="newp">
   <h2 id="newpTitle">Nuevo jugador</h2>
+  <div id="avPrev">🙂</div>
+  <p class="sub">Elegí tu animalito</p>
   <div class="avs" id="avs"></div>
   <input class="inp" id="newName" maxlength="12" placeholder="Nombre" autocomplete="off">
   <div class="row"><button class="pill" data-nav data-act="back">Cancelar</button><button class="big" data-nav data-act="savePlayer">¡Listo!</button></div>
@@ -290,6 +307,7 @@ body.princess #pStatus.turn{color:#fff}
 </section>
 
 <div class="ov hidden" id="ov"></div>
+<button id="fsBtn" class="ib" title="Pantalla completa">⛶</button>
 <div id="toast"></div>
 
 <!-- ============ MANDO ============ -->
@@ -358,7 +376,6 @@ function newProfile(name, av, id) {
   Object.assign(S.profiles[id], { name, av });
   return S.profiles[id];
 }
-if (!Object.keys(S.profiles).length) { const p = newProfile('Jugador', '🦄'); S.roster = [p.id]; }
 S.roster = S.roster.filter(id => S.profiles[id]);
 const LEVELS = ['Aprendiz', 'Exploradora', 'Detective', 'Sabia', 'Genia', 'Leyenda'];
 const levelOf = xp => { let l = 1; while (xp >= 60 * l * l) l++; return l; };
@@ -488,7 +505,7 @@ function show(id, push = true) {
   if (push && cur !== id) stack.push(cur);
   $$('.screen').forEach(s => s.classList.toggle('hidden', s.id !== id));
   cur = id;
-  ({ start: renderStart, players: renderPlayers, mode: renderMode, opts: renderOpts, album: renderAlbum })[id]?.();
+  ({ start: renderStart, mode: renderMode, opts: renderOpts, album: renderAlbum })[id]?.();
   setTimeout(() => { const f = $('#' + id + ' .big, #' + id + ' [data-nav]'); if (f && !document.activeElement?.closest('#' + id)) f.focus({ preventScroll: true }); }, 30);
   broadcastState();
 }
@@ -511,6 +528,26 @@ function moveFocus(dir) {
   }
   best?.focus();
 }
+
+/* ================= PANTALLA COMPLETA ================= */
+const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+const fsOk = () => !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+const standalone = () => matchMedia('(display-mode: fullscreen)').matches || matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function enterFS() {
+  if (fsEl()) return;
+  const d = document.documentElement;
+  try {
+    if (d.requestFullscreen) d.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+    else if (d.webkitRequestFullscreen) d.webkitRequestFullscreen();
+    else if (isIOS() && !standalone()) toast('En iPhone: tocá <b>Compartir → “Agregar a inicio”</b> y abrilo desde ahí para jugar en pantalla completa.', 6000);
+  } catch {}
+}
+function toggleFS() { if (fsEl()) (document.exitFullscreen || document.webkitExitFullscreen)?.call(document); else enterFS(); }
+function syncFS() { const b = $('#fsBtn'); const on = !!fsEl(); b.textContent = on ? '🗗' : '⛶'; b.title = on ? 'Salir de pantalla completa' : 'Pantalla completa'; b.classList.toggle('on', on); }
+document.addEventListener('fullscreenchange', syncFS); document.addEventListener('webkitfullscreenchange', syncFS);
+$('#fsBtn').onclick = e => { e.stopPropagation(); toggleFS(); };
+if (standalone() || (!fsOk() && !isIOS())) $('#fsBtn').classList.add('hidden');
 
 /* ================= OPCIONES ================= */
 function applyPrefs() {
@@ -536,18 +573,25 @@ function allPlayers() {
   for (const pad of pads.values()) if (pad.ready) list.push({ id: pad.id, name: pad.name, av: pad.av, phone: true, coins: S.profiles[pad.id]?.coins || 0 });
   return list;
 }
+let editMode = false;
 function renderStart() {
   const ps = allPlayers();
-  $('#startPlayers').innerHTML = ps.map(p => `<span class="chip"><span class="av">${esc(p.av)}</span>${esc(p.name)}${p.phone ? ' 📱' : ''} <span class="coins">${S.profiles[p.id]?.coins ?? 0} 🪙</span></span>`).join('') || '<span class="sub">Sumá jugadores 👥</span>';
-  const canPack = ps.some(p => (S.profiles[p.id]?.coins || 0) >= PACK_COST);
-  $('#packBadge').classList.toggle('hidden', !canPack);
-}
-function renderPlayers() {
   const ids = new Set(S.roster);
   const phones = [...pads.values()].filter(p => p.ready);
-  $('#plist').innerHTML = Object.values(S.profiles).filter(p => !phones.some(x => x.id === p.id)).map(p =>
-    `<div class="pwrap"><button class="pcard${ids.has(p.id) ? ' on' : ''}" data-nav data-toggle="${p.id}"><span class="av">${esc(p.av)}</span><span class="t"><b>${esc(p.name)}</b><small>${levelName(levelOf(p.xp))} · ${p.coins} 🪙 · 📒 ${albumCount(p)}</small></span><span class="ck">${ids.has(p.id) ? '✅' : '➕'}</span></button><button class="ed" data-nav data-edit="${p.id}" title="Editar">✏️</button></div>`).join('') +
-    phones.map(p => `<div class="pcard on"><span class="av">${esc(p.av)}</span><span class="t"><b>${esc(p.name)}</b><small>📱 con su celular</small></span><span class="ck">📱</span></div>`).join('');
+  const locals = Object.values(S.profiles).filter(p => !phones.some(x => x.id === p.id));
+  if (!locals.length) editMode = false;
+  $('#who').classList.toggle('editing', editMode);
+  $('#who').innerHTML = locals.map(p => `<button class="wb${ids.has(p.id) ? ' on' : ''}" data-nav ${editMode ? 'data-edit' : 'data-toggle'}="${p.id}"><span class="av">${esc(p.av)}</span><span class="ck">${editMode ? '✏️' : ids.has(p.id) ? '✓' : ''}</span><span class="nm">${esc(p.name)}</span><small>${p.coins} 🪙 · 📒 ${albumCount(p)}</small></button>`).join('') +
+    phones.map(p => `<div class="wb on"><span class="av">${esc(p.av)}</span><span class="ck">📱</span><span class="nm">${esc(p.name)}</span><small>${S.profiles[p.id]?.coins || 0} 🪙</small></div>`).join('') +
+    (editMode ? '' : `<button class="wb add" data-nav data-act="newPlayer"><span class="av">➕</span><span class="nm">Nuevo</span><small>jugador</small></button>`);
+  $('#whoTitle').textContent = editMode ? '✏️ Editar jugadores' : ps.length > 1 ? `¿Quién juega? (${ps.length})` : '¿Quién juega?';
+  $('#whoHint').textContent = editMode ? 'Tocá un jugador para cambiarle el nombre, reiniciarlo o borrarlo'
+    : !locals.length && !phones.length ? '¡Creá tu jugador para empezar!' : 'Tocá para sumar o sacar · con el celu se suman solos';
+  $('#whoTools').innerHTML = locals.length ? `<button class="pill${editMode ? ' on' : ''}" data-nav data-act="editMode">${editMode ? '✔ Listo' : '✏️ Editar'}</button><button class="pill" data-nav data-act="album">📒 Álbum</button>` : '';
+  $('#btnPlay').classList.toggle('off', !ps.length);
+  $('#btnPlay').textContent = ps.length ? `▶ Jugar${ps.length > 1 ? ` (${ps.length})` : ''}` : '➕ Crear jugador';
+  const canPack = ps.some(p => (S.profiles[p.id]?.coins || 0) >= PACK_COST);
+  $('#packBadge').classList.toggle('hidden', !canPack);
 }
 let newAv = AVATARS[0], editId = null;
 function openNewPlayer(id) {
@@ -558,6 +602,7 @@ function openNewPlayer(id) {
   $('#editExtra').classList.toggle('hidden', !pr);
   $('#avs').innerHTML = AVATARS.map(a => `<button class="avb${a === newAv ? ' on' : ''}" data-nav data-av="${a}">${a}</button>`).join('');
   $('#newName').value = pr ? pr.name : '';
+  $('#avPrev').textContent = newAv;
   show('newp');
 }
 
@@ -575,7 +620,7 @@ function renderMode() {
 let G = null;
 function startMatch() {
   const ps = allPlayers();
-  if (!ps.length) { toast('Sumá al menos un jugador 👥'); show('players'); return; }
+  if (!ps.length) { toast('Elegí quién juega 👆'); stack = []; show('start', false); return; }
   ps.forEach(p => { if (!S.profiles[p.id]) newProfile(p.name, p.av, p.id); });
   G = { players: ps.map(p => ({ id: p.id, name: p.name, av: p.av, phone: !!p.phone, score: 0, coins: 0, words: 0 })),
         diff: S.diff, cat: S.cat, rounds: S.rounds, round: 0, turn: 0, chooser: -1, secret: S.secret && ps.length >= 2 };
@@ -866,8 +911,8 @@ function doOpenPack() {
 function act(a, el) {
   ac();
   switch (a) {
-    case 'play': show('mode'); break;
-    case 'players': show('players'); break;
+    case 'play': if (!allPlayers().length) { openNewPlayer(); break; } show('mode'); break;
+    case 'editMode': editMode = !editMode; renderStart(); $('[data-act=editMode]')?.focus(); break;
     case 'album': hideOv(); show('album'); break;
     case 'opts': show('opts'); break;
     case 'back': back(); break;
@@ -876,7 +921,7 @@ function act(a, el) {
     case 'newPlayer': openNewPlayer(); break;
     case 'savePlayer': {
       const name = ($('#newName').value.trim() || 'Jugador').slice(0, 12);
-      const p = newProfile(name, newAv, editId || undefined); if (!S.roster.includes(p.id)) S.roster.push(p.id); save(); back(); renderPlayers(); break;
+      const p = newProfile(name, newAv, editId || undefined); if (!S.roster.includes(p.id)) S.roster.push(p.id); save(); back(); break;
     }
     case 'resetPlayer': {
       const pr = S.profiles[editId]; if (!pr) break;
@@ -885,7 +930,7 @@ function act(a, el) {
     case 'resetYes': {
       const pr = S.profiles[editId];
       if (pr) { Object.keys(pr).forEach(k => { if (/^pg\d/.test(k)) delete pr[k]; }); Object.assign(pr, { coins: 0, xp: 0, words: 0, stars: 0, album: {}, packs: 0 }); save(); toast(`🔄 ${esc(pr.name)} empieza de cero`); }
-      hideOv(); back(); renderPlayers(); break;
+      hideOv(); back(); break;
     }
     case 'deletePlayer': {
       const pr = S.profiles[editId]; if (!pr) break;
@@ -894,10 +939,10 @@ function act(a, el) {
     case 'deleteYes': {
       const pr = S.profiles[editId];
       if (pr) { delete S.profiles[editId]; S.roster = S.roster.filter(x => x !== editId); save(); toast(`🗑️ Se borró a ${esc(pr.name)}`); }
-      hideOv(); back(); renderPlayers(); break;
+      hideOv(); back(); break;
     }
     case 'secret': S.secret = !S.secret; save(); renderMode(); break;
-    case 'go': hideOv(); startMatch(); break;
+    case 'go': hideOv(); if (matchMedia('(pointer:coarse)').matches) enterFS(); startMatch(); break;
     case 'again': hideOv(); show('mode'); break;
     case 'nextWord': hideOv(); nextWord(); break;
     case 'matchEnd': hideOv(); matchEnd(); break;
@@ -914,7 +959,7 @@ function act(a, el) {
     case 'secretOk': gotSecret($('#secretInp').value); break;
     case 'secretSkip': if (G) { G.waitingSecret = false; beginWord(chooseWord(G.diff, G.cat)); } break;
     case 'openPack': hideOv(); doOpenPack(); break;
-    case 'fs': { const d = document.documentElement; document.fullscreenElement ? document.exitFullscreen?.() : (d.requestFullscreen || d.webkitRequestFullscreen)?.call(d); break; }
+    case 'fs': toggleFS(); break;
   }
 }
 document.addEventListener('click', e => {
@@ -922,8 +967,8 @@ document.addEventListener('click', e => {
   if (b.dataset.act) return act(b.dataset.act, b);
   if (b.dataset.k) { if (cur === 'game') press(b.dataset.k); return; }
   if (b.dataset.edit) { openNewPlayer(b.dataset.edit); return; }
-  if (b.dataset.toggle) { const id = b.dataset.toggle; S.roster = S.roster.includes(id) ? S.roster.filter(x => x !== id) : [...S.roster, id]; save(); renderPlayers(); SFX.key(); return; }
-  if (b.dataset.av) { newAv = b.dataset.av; $$('#avs .avb').forEach(x => x.classList.toggle('on', x === b)); SFX.key(); return; }
+  if (b.dataset.toggle) { const id = b.dataset.toggle; S.roster = S.roster.includes(id) ? S.roster.filter(x => x !== id) : [...S.roster, id]; save(); renderStart(); $(`[data-toggle="${id}"]`)?.focus(); SFX.key(); vib(15); return; }
+  if (b.dataset.av) { newAv = b.dataset.av; $('#avPrev').textContent = newAv; $$('#avs .avb').forEach(x => x.classList.toggle('on', x === b)); SFX.key(); vib(15); return; }
   if (b.dataset.diff) { S.diff = b.dataset.diff; save(); renderMode(); b.focus(); $(`[data-diff="${S.diff}"]`)?.focus(); SFX.key(); return; }
   if (b.dataset.cat) { S.cat = b.dataset.cat; save(); renderMode(); $(`[data-cat="${CSS.escape(S.cat)}"]`)?.focus(); SFX.key(); return; }
   if (b.dataset.rounds) { S.rounds = +b.dataset.rounds; save(); renderMode(); SFX.key(); return; }
@@ -992,7 +1037,7 @@ function startHost() {
   };
   open();
 }
-function refreshPlayersUI() { if (cur === 'start') renderStart(); if (cur === 'players') renderPlayers(); if (cur === 'mode') renderMode(); if (G && cur === 'game') renderGame(); broadcastState(); }
+function refreshPlayersUI() { if (cur === 'start') renderStart(); if (cur === 'mode') renderMode(); if (G && cur === 'game') renderGame(); broadcastState(); }
 function onPad(conn, d) {
   if (!d || !d.t) return;
   if (d.t === 'hello') {
@@ -1026,6 +1071,7 @@ function startPad(c) {
   $$('.screen').forEach(s => s.classList.add('hidden'));
   $('#pad').classList.remove('hidden');
   if (HUB) $$('#pad .hubBtn').forEach(b => b.classList.remove('hidden'));
+  $('#pad header').appendChild($('#fsBtn'));
   const goHubPad = () => location.href = HUB_URL + '/?j=' + HUB;
   let pid = localStorage.getItem('ps-pid'); if (!pid) { pid = Math.random().toString(36).slice(2, 10); localStorage.setItem('ps-pid', pid); }
   const me = { name: QS.get('pn') || localStorage.getItem('ps-name') || '', av: QS.get('pa') || localStorage.getItem('ps-av') || '' };
